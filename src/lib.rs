@@ -6,6 +6,35 @@ use std::{io, sync, time};
 
 use thiserror::Error;
 
+static ALLOCATED: AtomicUsize = AtomicUsize::new(0);
+static FREEED: AtomicUsize = AtomicUsize::new(0);
+
+#[macro_export]
+macro_rules! instrumented_allocator {
+    () => {
+        #[global_allocator]
+        static A: readings::InstrumentedAllocator = readings::InstrumentedAllocator;
+    }
+}
+
+pub struct InstrumentedAllocator;
+
+unsafe impl std::alloc::GlobalAlloc for InstrumentedAllocator {
+    unsafe fn alloc(&self, layout: std::alloc::Layout) -> *mut u8 {
+        let ptr = std::alloc::System.alloc(layout);
+        if !ptr.is_null() {
+            ALLOCATED.fetch_add(layout.size(), Relaxed);
+        }
+        ptr
+    }
+    unsafe fn dealloc(&self, ptr: *mut u8, layout: std::alloc::Layout) {
+        if !ptr.is_null() {
+            FREEED.fetch_add(layout.size(), Relaxed);
+        }
+        std::alloc::System.dealloc(ptr, layout);
+    }
+}
+
 #[derive(Error, Debug)]
 pub enum ReadingsError {
     #[error("io Error accssing /proc/self/stat")]
@@ -37,11 +66,6 @@ pub struct OsReadings {
     pub minor_fault: u64,
     pub major_fault: u64,
 }
-
-static ALLOCATED: AtomicUsize = AtomicUsize::new(0);
-static FREEED: AtomicUsize = AtomicUsize::new(0);
-
-
 
 #[derive(Clone)]
 pub struct Monitor(sync::Arc<sync::Mutex<MonitorData>>);
