@@ -6,9 +6,14 @@ It is made of two crates:
 * readings-probe is the instrumentation bit that you must depend on and setup
 * readings contains the executable that will make charts from the instrumentation output
 
+I am trying to make it easy to get the kind of graphs I used in my blog post series
+a few years ago: http://www.poumeyrol.fr/2016/02/08/Hashes-to-hashes/ . Readings
+is not there yet, but the will is there.
+
 # Status
 
-This is alpha, early work bazaar style. For instance, the probe will only compile on Linux and Mac.
+This is alpha, early work bazaar style. For instance, the probing code only
+compiles on Linux and Mac.
 
 # Quickstart
 
@@ -52,3 +57,18 @@ fn main() -> readings_probe::ReadingsResult<()> {
 * run it
 
 `readings readings.out`
+
+# License
+
+## Apache 2.0/MIT
+
+All original work licensed under either of
+ * Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+ * MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+at your option.
+
+## Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in the work by you, as defined in the Apache-2.0 license, shall
+be dual licensed as above, without any additional terms or conditions.
