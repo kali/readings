@@ -1,12 +1,2 @@
-[package]
-name = "readings"
-version = "0.1.0"
-authors = ["Mathieu Poumeyrol <kali@zoy.org>"]
-edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-libc = "0.2.68"
-num_cpus = "1.12.0"
-thiserror = "1.0.13"
+[workspace]
+members = ["probe", "cli"]
