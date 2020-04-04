@@ -10,7 +10,7 @@ fn get_rusage() -> rusage {
     }
 }
 
-pub fn get_os_readings() -> Result<OsReadings, ReadingsError> {
+pub(crate) fn get_os_readings() -> Result<OsReadings, ReadingsError> {
     let proc_stat =
         std::fs::read_to_string("/proc/self/stat").map_err(|e| ReadingsError::ProcStat(e))?;
     let mut tokens = proc_stat.split(" ");
