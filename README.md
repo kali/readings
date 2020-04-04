@@ -23,6 +23,13 @@ from the OS (help wanted from a Win32 guru for faults and mem usage :) ).
 
 ## Instrument
 
+In `Cargo.toml`:
+
+```toml
+[dependencies]
+readings-probe = "0.1"
+```
+
 In your main, or just around:
 
 ```rust
