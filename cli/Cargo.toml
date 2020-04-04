@@ -3,6 +3,14 @@ name = "readings"
 version = "0.1.0"
 authors = ["Mathieu Poumeyrol <kali@zoy.org>"]
 edition = "2018"
+description = "Graph vital metrics process logging"
+repository = "https://github.com/kali/readings"
+keywords = [ "Profiling", "Auditing", ]
+categories = [ "Development tools" ]
+
+[badges]
+maintenance = { status = "actively-developed" }
+
 
 [dependencies]
 clap = "*"
