@@ -27,6 +27,7 @@
 //!     probe.spawn_heartbeat(std::time::Duration::from_millis(1000))?;
 //! 
 //!     // do some stuff, update progress
+//!     let percent_done = 12;
 //!     progress.store(percent_done, std::sync::atomic::Ordering::Relaxed);
 //! 
 //!     // do more stuff, log an event
