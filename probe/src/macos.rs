@@ -1,8 +1,9 @@
-
 use libc::*;
+
+use super::{OsReadings, ReadingsResult};
+
 #[repr(C)]
-#[derive(Default)]
-pub struct BasicTaskInfo {
+struct BasicTaskInfo {
     pub virtual_size: u64,
     pub resident_size: u64,
     pub resident_size_max: u64,
@@ -12,36 +13,40 @@ pub struct BasicTaskInfo {
     pub suspend_count: c_uint,
 }
 
-mod ffi {
-    use libc::*;
-    extern "C" {
-        pub fn mach_task_self() -> c_uint;
-        pub fn task_info(
-            task: c_uint,
-            flavor: c_int,
-            task_info: *mut super::BasicTaskInfo,
-            count: *mut c_uint,
-        ) -> c_uint;
-    }
+extern "C" {
+    fn mach_task_self() -> c_uint;
+    fn task_info(
+        task: c_uint,
+        flavor: c_int,
+        task_info: *mut BasicTaskInfo,
+        count: *mut c_uint,
+    ) -> c_uint;
 }
-pub fn task_self() -> c_uint {
-    unsafe { ffi::mach_task_self() }
-}
-pub fn task_info() -> BasicTaskInfo {
-    let mut info = BasicTaskInfo::default();
-    let mut count: c_uint =
-        (::std::mem::size_of::<BasicTaskInfo>() / ::std::mem::size_of::<c_uint>()) as c_uint;
+
+fn basic_task_info() -> BasicTaskInfo {
     unsafe {
-        ffi::task_info(task_self(), 20, &mut info, &mut count);
+        let mut info = std::mem::zeroed();
+        let mut count: c_uint =
+            (::std::mem::size_of::<BasicTaskInfo>() / ::std::mem::size_of::<c_uint>()) as c_uint;
+        let me = mach_task_self();
+        task_info(me, 20, &mut info, &mut count);
+        info
     }
-    info
+}
+
+fn get_rusage() -> rusage {
+    unsafe {
+        let mut usage = std::mem::zeroed();
+        getrusage(RUSAGE_SELF, &mut usage);
+        usage
+    }
 }
 
 #[cfg(target_os = "macos")]
-pub fn get_memory_usage() -> Result<ResourceUsage> {
-    let info = darwin::task_info();
+pub(crate) fn get_os_readings() -> ReadingsResult<OsReadings> {
+    let info = basic_task_info();
     let rusage = get_rusage();
-    Ok(ResourceUsage {
+    Ok(OsReadings {
         virtual_size: info.virtual_size,
         resident_size: info.resident_size,
         resident_size_max: info.resident_size_max,

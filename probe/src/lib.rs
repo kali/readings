@@ -99,14 +99,17 @@ pub enum ReadingsError {
 /// Reading generic Result helper.
 pub type ReadingsResult<T> = Result<T, ReadingsError>;
 
-#[cfg(target_os = "macos")]
-mod macos;
-
 #[cfg(target_os = "linux")]
 mod linux;
 
 #[cfg(target_os = "linux")]
 use linux::get_os_readings;
+
+#[cfg(target_os = "macos")]
+mod macos;
+
+#[cfg(target_os = "macos")]
+use macos::get_os_readings;
 
 #[derive(Debug)]
 pub(crate) struct OsReadings {
