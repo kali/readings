@@ -3,7 +3,7 @@ Readings is meant to get vital information for the health of a process.
 ![rustc >= 1.39.0](https://img.shields.io/badge/rustc-%3E%3D1.39.0-brightgreen)
 ![MIT/Apache 2](https://img.shields.io/crates/l/readings)
 ![Build and test](https://github.com/kali/readings/workflows/Build%20and%20test/badge.svg)
-[![Doc](https://docs.rs/readings/badge.svg)](https://docs.rs/readings-probe)
+[![Doc](https://docs.rs/readings-probe/badge.svg)](https://docs.rs/readings-probe)
 
 It is made of two crates:
 * readings-probe is the instrumentation bit that you must depend on and setup
