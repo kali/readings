@@ -2,10 +2,20 @@
 name = "readings-probe"
 version = "0.1.0"
 authors = ["Mathieu Poumeyrol <kali@zoy.org>"]
+license = "MIT/Apache-2.0"
 edition = "2018"
+description = "Probe for vital metrics process logging"
+repository = "https://github.com/kali/readings"
+keywords = [ "Profiling", "Auditing", ]
+categories = [ "Development tools" ]
+
+[badges]
+maintenance = { status = "actively-developed" }
 
 [dependencies]
 libc = "0.2.68"
 num_cpus = "1.12.0"
 thiserror = "1.0.13"
+
+[target.'cfg(windows)'.dependencies]
 winapi = "0.3"
