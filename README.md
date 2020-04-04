@@ -11,12 +11,12 @@ It is made of two crates:
 
 I am trying to make it easy to get the kind of graphs I used in my blog post series
 a few years ago: http://www.poumeyrol.fr/2016/02/08/Hashes-to-hashes/ . Readings
-is not there yet, but the will is there.
+is not there yet, but the will is here.
 
 # Status
 
 This is alpha, early work bazaar style. For instance, the probing code only
-compiles on Linux, Mac and Windows. And windows has only CPU intrumentation
+compiles on Linux, Mac and Windows. And windows has only CPU instrumentation
 from the OS (help wanted from a Win32 guru for faults and mem usage :) ).
 
 # Quickstart
@@ -73,7 +73,7 @@ fn main() -> readings_probe::ReadingsResult<()> {
 
 ![Tract example](tract-example.png)
 
-This is a incredibly beatiful example with [tract](https://github.com/snipsco/tract) loading a big
+This is a incredibly beautiful example with [tract](https://github.com/snipsco/tract) loading a big
 neural network modern and evaluating on a loop.
 
 We know it does not exactly look beautiful... But this is 0.1! We will get
@@ -82,16 +82,16 @@ better. In the meantime here are a few hints:
   saturation (as we the ran the grapher with `--single-core`).
 * both blue lines and are represent memory usage. The lower one is rust global
   allocator instrumentation, the higher one is the RSS as reported by the OS.
-  You can notice how the global allocator probe is much more usefull than the
+  You can notice how the global allocator probe is much more useful than the
   RSS one...
 * the yellow staircase is a user-defined metrics: in tract we defined one to
   count the loops over our neural network evaluation
 * the background grey strips represent events: each time `log_event` is called,
-  it switches between grey and white. The evant label is written in the lower
+  it switches between grey and white. The event label is written in the lower
   part.
-* memory graphes are obviously indexed by the right hand axis. All the rest is
-  a percentage: %cpu, or % of the maximum value reached for user defined
-  probeds.
+* memory graphs are obviously indexed by the right hand axis. All the rest is
+  a percentage: %cpu, or % of the maximum value reached for a user defined
+  probe.
 
 # License
 
