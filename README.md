@@ -16,7 +16,8 @@ is not there yet, but the will is there.
 # Status
 
 This is alpha, early work bazaar style. For instance, the probing code only
-compiles on Linux and Mac.
+compiles on Linux, Mac and Windows. And windows has only CPU intrumentation
+from the OS (help wanted from a Win32 guru for faults and mem usage :) ).
 
 # Quickstart
 
@@ -60,6 +61,30 @@ fn main() -> readings_probe::ReadingsResult<()> {
 * run it
 
 `readings readings.out`
+
+## Example
+
+![Tract example](tract-example.png)
+
+This is a incredibly beatiful example with [tract](https://github.com/snipsco/tract) loading a big
+neural network modern and evaluating on a loop.
+
+We know it does not exactly look beautiful... But this is 0.1! We will get
+better. In the meantime here are a few hints:
+* red curve (and area) represent the CPU usage. Here 100% represent one single core
+  saturation (as we the ran the grapher with `--single-core`).
+* both blue lines and are represent memory usage. The lower one is rust global
+  allocator instrumentation, the higher one is the RSS as reported by the OS.
+  You can notice how the global allocator probe is much more usefull than the
+  RSS one...
+* the yellow staircase is a user-defined metrics: in tract we defined one to
+  count the loops over our neural network evaluation
+* the background grey strips represent events: each time `log_event` is called,
+  it switches between grey and white. The evant label is written in the lower
+  part.
+* memory graphes are obviously indexed by the right hand axis. All the rest is
+  a percentage: %cpu, or % of the maximum value reached for user defined
+  probeds.
 
 # License
 
