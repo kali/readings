@@ -111,6 +111,12 @@ mod macos;
 #[cfg(target_os = "macos")]
 use macos::get_os_readings;
 
+#[cfg(target_os = "windows")]
+mod windows;
+
+#[cfg(target_os = "windows")]
+use windows::get_os_readings;
+
 #[derive(Debug)]
 pub(crate) struct OsReadings {
     pub virtual_size: u64,
