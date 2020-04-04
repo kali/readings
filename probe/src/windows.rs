@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use winapi::shared::minwindef::FILETIME;
 use winapi::um::processthreadsapi::{GetCurrentProcess, GetProcessTimes};
-use winapi::um::psapi::{GetProcessMemoryInfo, PROCESS_MEMORY_COUNTERS_EX};
+use winapi::um::psapi::{GetProcessMemoryInfo, PROCESS_MEMORY_COUNTERS};
 
 use super::{OsReadings, ReadingsResult};
 
@@ -29,26 +29,25 @@ pub(crate) fn get_os_readings() -> ReadingsResult<OsReadings> {
         let user_time = Duration::from_nanos(user_time * 100);
 
         // Query memory information
-        let mut mem_counters: PROCESS_MEMORY_COUNTERS_EX = std::mem::zeroed();
+        let mut mem_counters: PROCESS_MEMORY_COUNTERS = std::mem::zeroed();
         GetProcessMemoryInfo(
             h_process,
-            &mut mem_counters as *mut PROCESS_MEMORY_COUNTERS_EX as *mut _,
-            std::mem::size_of::<PROCESS_MEMORY_COUNTERS_EX>() as u32,
+            &mut mem_counters,
+            std::mem::size_of::<PROCESS_MEMORY_COUNTERS>() as u32,
         );
 
-        let virtual_size = mem_counters.PrivateUsage as u64;
         let resident_size = mem_counters.WorkingSetSize as u64;
         let resident_size_max = mem_counters.PeakWorkingSetSize as u64;
-        let major_fault = mem_counters.PageFaultCount as u64;
+        let minor_fault = mem_counters.PageFaultCount as u64;
 
         let usage = OsReadings {
-            virtual_size,
+            virtual_size: 0,
             resident_size,
             resident_size_max,
             user_time,
             system_time,
-            minor_fault: 0,
-            major_fault,
+            minor_fault,
+            major_fault: 0,
         };
 
         Ok(usage)
