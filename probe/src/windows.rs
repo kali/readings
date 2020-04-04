@@ -23,10 +23,9 @@ pub(crate) fn get_os_readings() -> ReadingsResult<OsReadings> {
             &mut user_time,
         );
         let system_time =
-            (kernel_time.dwHighDateTime as u32 as u64) << 32 + kernel_time.dwLowDateTime as u64;
+            ((kernel_time.dwHighDateTime as u64) << 32) + kernel_time.dwLowDateTime as u64;
         let system_time = Duration::from_nanos(system_time * 100);
-        let user_time =
-            (user_time.dwHighDateTime as u32 as u64) << 32 + user_time.dwLowDateTime as u64;
+        let user_time = ((user_time.dwHighDateTime as u64) << 32) + user_time.dwLowDateTime as u64;
         let user_time = Duration::from_nanos(user_time * 100);
 
         // Query memory information
