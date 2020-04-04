@@ -41,10 +41,10 @@ fn main() -> readings_probe::ReadingsResult<()> {
     let mut probe =
         readings_probe::Probe::new(std::fs::File::create("readings.out").unwrap()).unwrap();
 
-    // We will use an AtomicI64 to communicate a user-defined metrics ("progress") to the probe.
+    // We will use an AtomicI64 to communicate a user-defined metric ("progress") to the probe.
     let progress = probe.register_i64("progress".to_string())?;
 
-    // Starts the probe (1sec i a lot. heartbeat can be realistically set as low as a few millis).
+    // Starts the probe (1sec is a lot. The heartbeat can be realistically set as low as a few millis).
     probe.spawn_heartbeat(std::time::Duration::from_millis(1000))?;
 
     // do some stuff, update progress
@@ -74,23 +74,23 @@ fn main() -> readings_probe::ReadingsResult<()> {
 ![Tract example](tract-example.png)
 
 This is a incredibly beautiful example with [tract](https://github.com/snipsco/tract) loading a big
-neural network modern and evaluating on a loop.
+neural network model and evaluating on a loop.
 
 We know it does not exactly look beautiful... But this is 0.1! We will get
 better. In the meantime here are a few hints:
-* red curve (and area) represent the CPU usage. Here 100% represent one single core
+* red curve (and area) represent the CPU usage. Here 100% represents one single core
   saturation (as we the ran the grapher with `--single-core`).
-* both blue lines and are represent memory usage. The lower one is rust global
+* both blue lines represent memory usage. The lower one is rust global
   allocator instrumentation, the higher one is the RSS as reported by the OS.
   You can notice how the global allocator probe is much more useful than the
   RSS one...
-* the yellow staircase is a user-defined metrics: in tract we defined one to
+* the yellow staircase is a user-defined metric: in tract we defined one to
   count the loops over our neural network evaluation
 * the background grey strips represent events: each time `log_event` is called,
   it switches between grey and white. The event label is written in the lower
   part.
 * memory graphs are obviously indexed by the right hand axis. All the rest is
-  a percentage: %cpu, or % of the maximum value reached for a user defined
+  a percentage: %cpu, or % of the maximum value reached for a user-defined
   probe.
 
 # License
