@@ -1,3 +1,7 @@
+# 0.1.2
+
+* Windows support for RSZ, RSZMAX, and faults. (many thanks to @lqd)
+
 # 0.1.1
 
 * expose get_os_readings() (RSS, VSZ, faults and CPU counters)
