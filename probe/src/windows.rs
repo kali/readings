@@ -1,7 +1,9 @@
+use std::time::Duration;
+
 use winapi::shared::minwindef::FILETIME;
 use winapi::um::processthreadsapi::{GetCurrentProcess, GetProcessTimes};
 
-use super::{ OsReadings, ReadingsResult };
+use super::{OsReadings, ReadingsResult};
 
 pub(crate) fn get_os_readings() -> ReadingsResult<OsReadings> {
     unsafe {
@@ -17,18 +19,18 @@ pub(crate) fn get_os_readings() -> ReadingsResult<OsReadings> {
             &mut kernel_time,
             &mut user_time,
         );
-        let kernel_time =
+        let system_time =
             (kernel_time.dwHighDateTime as u64) << 32 + kernel_time.dwLowDateTime as u64;
-        let kernel_time = kernel_time as f64 * 1e-7; // 100 nanosec
+        let system_time = Duration::from_nanos(system_time * 100);
         let user_time = (user_time.dwHighDateTime as u64) << 32 + user_time.dwLowDateTime as u64;
-        let user_time = user_time as f64 * 1e-7; // 100 nanosec
+        let user_time = Duration::from_nanos(user_time * 100);
 
         let usage = OsReadings {
             virtual_size: 0,
             resident_size: 0,
             resident_size_max: 0,
             user_time,
-            system_time: kernel_time,
+            system_time,
             minor_fault: 0,
             major_fault: 0,
         };

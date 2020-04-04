@@ -50,8 +50,8 @@ pub(crate) fn get_os_readings() -> ReadingsResult<OsReadings> {
         virtual_size: info.virtual_size,
         resident_size: info.resident_size,
         resident_size_max: info.resident_size_max,
-        user_time: rusage.ru_utime.tv_sec as f64 + rusage.ru_utime.tv_usec as f64 / 1_000_000f64,
-        system_time: rusage.ru_stime.tv_sec as f64 + rusage.ru_stime.tv_usec as f64 / 1_000_000f64,
+        user_time: Duration::from_secs(rusage.ru_utime.tv_sec as _) + Duration::from_micros(rusage.ru_utime.tv_usec as _),
+        system_time: Duration::from_secs(rusage.ru_stime.tv_sec as _) + Duration::from_micros(rusage.ru_stime.tv_usec as _),
         minor_fault: rusage.ru_minflt as u64,
         major_fault: rusage.ru_majflt as u64,
     })
