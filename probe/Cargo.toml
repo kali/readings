@@ -7,7 +7,7 @@ edition = "2018"
 description = "Probe for vital metrics process logging"
 repository = "https://github.com/kali/readings"
 keywords = [ "Profiling", "Auditing", ]
-categories = [ "Development tools" ]
+categories = [ "development-tools::profiling" ]
 
 [badges]
 maintenance = { status = "actively-developed" }
