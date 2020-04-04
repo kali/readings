@@ -3,47 +3,47 @@
 //!
 //! Readings goal is to make process vital metrics intrumentation as easy as
 //! possible.
-//! 
+//!
 //! This is the instrumentation library that must be embedded in the client
 //! code.
 //!
 //! Please refer to the [Readings](http://github.com/kali/readings)
-//! 
-//! 
+//!
+//!
 //! ```rust
 //! // this is optional but the cost may be worth it. YMMV. It instruments
 //! // Rust global allocator.
 //! readings_probe::instrumented_allocator!();
-//! 
+//!
 //! fn main() -> readings_probe::ReadingsResult<()> {
 //!     // setup the probe
 //!     let mut probe =
 //!         readings_probe::Probe::new(std::fs::File::create("readings.out").unwrap()).unwrap();
-//! 
+//!
 //!     // We will use an AtomicI64 to communicate a user-defined metrics ("progress") to the probe.
 //!     let progress = probe.register_i64("progress".to_string())?;
-//! 
+//!
 //!     // Starts the probe (1sec i a lot. heartbeat can be realistically set as low as a few millis).
 //!     probe.spawn_heartbeat(std::time::Duration::from_millis(1000))?;
-//! 
+//!
 //!     // do some stuff, update progress
 //!     let percent_done = 12;
 //!     progress.store(percent_done, std::sync::atomic::Ordering::Relaxed);
-//! 
+//!
 //!     // do more stuff, log an event
 //!     probe.log_event("about to get crazy")?;
-//! 
+//!
 //!     // still more stuff, and another event
 //!     probe.log_event("done")?;
 //!     Ok(())
 //! }
 //! ```
 
-
 use std::io::Write;
 use std::sync::atomic::Ordering::Relaxed;
 use std::sync::atomic::{AtomicI64, AtomicUsize};
 use std::sync::Arc;
+use std::time::Duration;
 use std::{io, sync, time};
 
 use thiserror::Error;
@@ -51,7 +51,7 @@ use thiserror::Error;
 static ALLOCATED: AtomicUsize = AtomicUsize::new(0);
 static FREEED: AtomicUsize = AtomicUsize::new(0);
 
-/// Setup global allocator instrumentation, to track rust-managed memory. 
+/// Setup global allocator instrumentation, to track rust-managed memory.
 ///
 /// It is not mandatory to do so, as we also register the RSZ and VSZ as
 /// reported by the OS, but it may be interesting. From our experience it may be
@@ -102,29 +102,41 @@ pub type ReadingsResult<T> = Result<T, ReadingsError>;
 #[cfg(target_os = "linux")]
 mod linux;
 
-#[cfg(target_os = "linux")]
-use linux::get_os_readings;
-
 #[cfg(target_os = "macos")]
 mod macos;
-
-#[cfg(target_os = "macos")]
-use macos::get_os_readings;
 
 #[cfg(target_os = "windows")]
 mod windows;
 
-#[cfg(target_os = "windows")]
-use windows::get_os_readings;
+/// Returns metrics from the operating system interface.
+///
+/// Beware, not all operating systems are made equal.
+#[allow(unreachable_code)]
+pub fn get_os_readings() -> ReadingsResult<OsReadings> {
+    #[cfg(target_os = "linux")]
+    return linux::get_os_readings();
+    #[cfg(target_os = "macos")]
+    return macos::get_os_readings();
+    #[cfg(target_os = "windows")]
+    return windows::get_os_readings();
+    return unsafe { Ok(std::mem::zeroed()) };
+}
 
 #[derive(Debug)]
-pub(crate) struct OsReadings {
+pub struct OsReadings {
+    /// Process virtual size
     pub virtual_size: u64,
+    /// Process resident size
     pub resident_size: u64,
+    /// Process resident size high-water mark
     pub resident_size_max: u64,
-    pub user_time: f64,
-    pub system_time: f64,
+    /// CPU Time in userland (in s)
+    pub user_time: Duration,
+    /// CPU Time in kernel (in s)
+    pub system_time: Duration,
+    /// Minor faults counter
     pub minor_fault: u64,
+    /// Minor faults counter
     pub major_fault: u64,
 }
 
@@ -166,7 +178,10 @@ impl ProbeData {
         write!(
             self.writer,
             " {:8.6} {:8.6} {:10} {:10}",
-            usage.user_time, usage.system_time, usage.minor_fault, usage.major_fault
+            usage.user_time.as_secs_f64(),
+            usage.system_time.as_secs_f64(),
+            usage.minor_fault,
+            usage.major_fault
         )?;
         write!(
             self.writer,
@@ -212,11 +227,12 @@ impl Probe {
             return Err(ReadingsError::LateRegistertingMetricsAttempt);
         }
         let it = Arc::new(AtomicI64::new(0));
-        m.metrics_i64.push((name.as_ref().replace(" ", "_"), it.clone()));
+        m.metrics_i64
+            .push((name.as_ref().replace(" ", "_"), it.clone()));
         Ok(it)
     }
 
-    /// Spawn a thread that will record all vitals at every "interval". 
+    /// Spawn a thread that will record all vitals at every "interval".
     pub fn spawn_heartbeat(&mut self, interval: time::Duration) -> ReadingsResult<()> {
         let probe = self.clone();
         probe.log_event("spawned_heartbeat")?;
@@ -241,7 +257,7 @@ impl Probe {
         Ok(())
     }
 
-    /// Spawn a thread that will record all vitals at every "interval". 
+    /// Spawn a thread that will record all vitals at every "interval".
     pub fn log_event(&self, event: &str) -> ReadingsResult<()> {
         self.write_line(std::time::Instant::now(), &event.replace(" ", "_"))
     }

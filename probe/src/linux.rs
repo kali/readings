@@ -1,5 +1,7 @@
 use libc::{getrusage, rusage, RUSAGE_SELF};
 
+use std::time::Duration;
+
 use super::{OsReadings, ReadingsError};
 
 fn get_rusage() -> rusage {
@@ -19,8 +21,8 @@ pub(crate) fn get_os_readings() -> Result<OsReadings, ReadingsError> {
         virtual_size: tokens.nth(22).unwrap().parse().unwrap_or(0),
         resident_size: 4 * 1024 * tokens.next().unwrap().parse().unwrap_or(0),
         resident_size_max: 1024 * rusage.ru_maxrss as u64,
-        user_time: rusage.ru_utime.tv_sec as f64 + rusage.ru_utime.tv_usec as f64 / 1_000_000f64,
-        system_time: rusage.ru_stime.tv_sec as f64 + rusage.ru_stime.tv_usec as f64 / 1_000_000f64,
+        user_time: Duration::from_secs(rusage.ru_utime.tv_sec as _) + Duration::from_micros(rusage.ru_utime.tv_usec as _),
+        system_time: Duration::from_secs(rusage.ru_stime.tv_sec as _) + Duration::from_micros(rusage.ru_stime.tv_usec as _),
         minor_fault: rusage.ru_minflt as u64,
         major_fault: rusage.ru_majflt as u64,
     })
