@@ -1,5 +1,7 @@
 use libc::*;
 
+use std::time::Duration;
+
 use super::{OsReadings, ReadingsResult};
 
 #[repr(C)]
