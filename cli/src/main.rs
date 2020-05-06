@@ -72,7 +72,7 @@ fn plot(data: &str, matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error
 
     let max_memory = data.iter().map(|l| val::<i64>(l, 3)).max().unwrap();
     let max_memory_range = 10i64.pow((max_memory as f64).log10() as u32 + 1);
-    let mem_magnitude = ((max_memory_range as f64).log10() as usize) / 3 * 3;
+    let mem_magnitude = ((max_memory_range as f64).log10() as usize - 2) / 3 * 3;
     let mem_magnitude_div = 10i64.pow(mem_magnitude as u32);
     let mem_magnitude_suffix = ["", "kB", "MB", "GB", "TB"][mem_magnitude / 3];
 
