@@ -5,7 +5,7 @@ use std::fs;
 
 use plotters::prelude::*;
 
-fn main() {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let matches = clap_app!(myapp =>
      (version: "0.1")
      (author: "Mathieu Poumeyrol <kali@zoy.org>")
@@ -16,7 +16,8 @@ fn main() {
      (@arg TO: -t --("to") +takes_value "Timestamp (secodns) or event label to stop at.")
     )
     .get_matches();
-    plot(matches.value_of("INPUT").unwrap(), &matches).unwrap();
+    plot(matches.value_of("INPUT").unwrap(), &matches)?;
+    Ok(())
 }
 
 fn val<T: std::fmt::Debug + std::str::FromStr>(line: &str, ith: usize) -> T
@@ -49,7 +50,7 @@ fn tranlate_time_expr(time: &str, lines: &[&str]) -> Result<f32, Box<dyn std::er
             .iter()
             .find(|l| l.split(" ").last().unwrap() == time)
             .map(|l| val(l, 0))
-            .ok_or_else(|| format!("label {} not fond", time).into())
+            .ok_or_else(|| format!("label not fond: {}", time).into())
     })
 }
 
