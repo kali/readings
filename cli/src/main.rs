@@ -12,6 +12,8 @@ fn main() {
      (about: "Readings library plotter")
      (@arg INPUT: +required "Sets the input file to plot")
      (@arg SINGLE_CORE: --("single-core") "Show CPU assuming single thread")
+     (@arg FROM: -f --("from") +takes_value "Timestamp (seconds) or event label to start from")
+     (@arg TO: -t --("to") +takes_value "Timestamp (secodns) or event label to stop at.")
     )
     .get_matches();
     plot(matches.value_of("INPUT").unwrap(), &matches).unwrap();
@@ -36,6 +38,21 @@ where
         .map(move |line| (val(line, 0), val(line, ith)))
 }
 
+fn in_time_range(l: &str, start: f32, end: f32) -> bool {
+    let time = val(l, 0);
+    start <= time && time <= end
+}
+
+fn tranlate_time_expr(time: &str, lines: &[&str]) -> Result<f32, Box<dyn std::error::Error>> {
+    time.parse::<f32>().or_else(|_| {
+        lines
+            .iter()
+            .find(|l| l.split(" ").last().unwrap() == time)
+            .map(|l| val(l, 0))
+            .ok_or_else(|| format!("label {} not fond", time).into())
+    })
+}
+
 fn plot(data: &str, matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::Error>> {
     let png = format!("{}.png", data);
     let data = fs::read(data)?;
@@ -43,14 +60,6 @@ fn plot(data: &str, matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error
     let data = String::from_utf8(data)?;
     let header = data.lines().nth(1).unwrap();
     let data: Vec<&str> = data.lines().skip(2).collect();
-    let time_end = data
-        .last()
-        .unwrap()
-        .split_whitespace()
-        .nth(0)
-        .unwrap()
-        .parse::<f32>()
-        .unwrap();
 
     let mut user_defined = header.split_whitespace().skip(11).collect::<Vec<_>>();
     user_defined.pop();
@@ -67,6 +76,21 @@ fn plot(data: &str, matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error
         .collect();
     let user_defined_len = user_defined.len();
 
+    let time_start: f32 = tranlate_time_expr(matches.value_of("FROM").unwrap_or("0.0"), &data)?;
+    let time_end: f32 = matches
+        .value_of("TO")
+        .map(|v| tranlate_time_expr(v, &data))
+        .transpose()?
+        .unwrap_or_else(|| {
+            data.last()
+                .unwrap()
+                .split_whitespace()
+                .nth(0)
+                .unwrap()
+                .parse()
+                .unwrap()
+        });
+
     let root = BitMapBackend::new(&*png, (1024, 768)).into_drawing_area();
     root.fill(&WHITE)?;
 
@@ -78,6 +102,7 @@ fn plot(data: &str, matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error
 
     let events = data
         .iter()
+        .filter(|l| in_time_range(l, time_start, time_end))
         .filter(|l| {
             l.split_whitespace()
                 .nth(11 + user_defined_len)
@@ -92,8 +117,8 @@ fn plot(data: &str, matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error
         .y_label_area_size(50)
         .right_y_label_area_size(60)
         .margin(5)
-        .build_ranged(0f32..time_end, 0f32..1.01f32)?
-        .set_secondary_coord(0f32..time_end, 0..max_memory_range);
+        .build_ranged(time_start..time_end, 0f32..1.01f32)?
+        .set_secondary_coord(time_start..time_end, 0..max_memory_range);
 
     chart
         .configure_mesh()
@@ -108,10 +133,10 @@ fn plot(data: &str, matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error
         .draw()?;
 
     for i in 0..events.len() / 2 {
-        let time_start = val(events[2 * i], 0);
-        let time_end = val(events[2 * i + 1], 0);
+        let ev_start = val(events[2 * i], 0);
+        let ev_end = val(events[2 * i + 1], 0);
         chart.plotting_area().draw(&Rectangle::new(
-            [(time_start, 0.0), (time_end, 1.0)],
+            [(ev_start, 0.0), (ev_end, 1.0)],
             RGBColor(200, 200, 200).to_rgba().filled(),
         ))?;
     }
@@ -135,6 +160,7 @@ fn plot(data: &str, matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error
 
     let hearbeat_series = data
         .iter()
+        .filter(|l| in_time_range(l, time_start, time_end))
         .filter(|l| {
             ["", "spawned_heartbeat"].contains(
                 &l.split_whitespace()
