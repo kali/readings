@@ -65,9 +65,30 @@ fn main() -> readings_probe::ReadingsResult<()> {
 
 `cargo install readings`
 
+* `readings --help`
+
+```
+Readings library plotter
+
+USAGE:
+    readings [FLAGS] [OPTIONS] <INPUT>
+
+FLAGS:
+        --single-core    Show CPU assuming single thread
+    -h, --help           Prints help information
+    -V, --version        Prints version information
+
+OPTIONS:
+    -f, --from <FROM>    Timestamp (seconds) or event label to start from
+    -t, --to <TO>        Timestamp (secodns) or event label to stop at.
+
+ARGS:
+    <INPUT>    Sets the input file to plot
+```
+
 * run it
 
-`readings readings.out`
+Run `readings readings.out` and open `readings.out.png`.
 
 ## Example
 
