@@ -17,5 +17,8 @@ libc = "0.2.68"
 num_cpus = "1.12.0"
 thiserror = "1.0.13"
 
+[dev-dependencies]
+jemallocator = "0.3"
+
 [target.'cfg(windows)'.dependencies]
 winapi = { version = "0.3", features = ["psapi", "processthreadsapi"]}
