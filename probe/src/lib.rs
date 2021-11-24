@@ -39,8 +39,12 @@
 //! }
 //! ```
 
-/// global allocator instrumentation
+extern crate lazy_static;
+
+/// allocator instrumentation
 pub mod alloc;
+/// grobal default probe instance and associated macros
+pub mod global;
 
 use std::io::Write;
 use std::sync::atomic::AtomicI64;
