@@ -1,6 +1,6 @@
 [package]
 name = "readings-probe"
-version = "0.1.4-alpha.0"
+version = "0.1.4"
 authors = ["Mathieu Poumeyrol <kali@zoy.org>"]
 license = "MIT/Apache-2.0"
 edition = "2018"
