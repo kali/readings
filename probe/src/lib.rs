@@ -229,7 +229,7 @@ impl Probe {
         Ok(())
     }
 
-    /// Spawn a thread that will record all vitals at every "interval".
+    /// Log an individual event with a label and the current values of metrics.
     pub fn log_event(&self, event: &str) -> ReadingsResult<()> {
         self.write_line(std::time::Instant::now(), &event.replace(" ", "_"))
     }
