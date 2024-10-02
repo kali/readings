@@ -1,7 +1,9 @@
 use std::time::Duration;
 
+#[cfg(unix)]
 use jemallocator::Jemalloc;
 
+#[cfg(unix)]
 readings_probe::wrap_global_allocator!(Jemalloc);
 
 fn main() -> readings_probe::ReadingsResult<()> {
