@@ -44,7 +44,7 @@ fn get_rusage() -> rusage {
     }
 }
 
-#[cfg(target_os = "macos")]
+#[cfg(any(target_os = "macos", target_os = "ios"))]
 pub(crate) fn get_os_readings() -> ReadingsResult<OsReadings> {
     let info = basic_task_info();
     let rusage = get_rusage();
