@@ -74,7 +74,7 @@ pub type ReadingsResult<T> = Result<T, ReadingsError>;
 #[cfg(target_os = "linux")]
 mod linux;
 
-#[cfg(target_os = "macos")]
+#[cfg(any(target_os = "macos", target_os = "ios"))]
 mod macos;
 
 #[cfg(target_os = "windows")]
@@ -87,7 +87,7 @@ mod windows;
 pub fn get_os_readings() -> ReadingsResult<OsReadings> {
     #[cfg(target_os = "linux")]
     return linux::get_os_readings();
-    #[cfg(target_os = "macos")]
+    #[cfg(any(target_os = "macos", target_os = "ios"))]
     return macos::get_os_readings();
     #[cfg(target_os = "windows")]
     return windows::get_os_readings();
