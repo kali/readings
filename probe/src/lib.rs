@@ -71,7 +71,7 @@ pub enum ReadingsError {
 /// Reading generic Result helper.
 pub type ReadingsResult<T> = Result<T, ReadingsError>;
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "android"))]
 mod linux;
 
 #[cfg(any(target_os = "macos", target_os = "ios"))]
@@ -85,7 +85,7 @@ mod windows;
 /// Beware, not all operating systems are made equal.
 #[allow(unreachable_code)]
 pub fn get_os_readings() -> ReadingsResult<OsReadings> {
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "android"))]
     return linux::get_os_readings();
     #[cfg(any(target_os = "macos", target_os = "ios"))]
     return macos::get_os_readings();
