@@ -1,3 +1,7 @@
+# 0.1.6 - 2024-11-21
+
+* Acivate probe on android
+
 # 0.1.2
 
 * Windows support for RSZ, RSZMAX, and faults. (many thanks to @lqd)
