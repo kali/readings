@@ -18,7 +18,9 @@ jobs:
     - name: cargo test
       env:
         RUST_VERSION: ${{matrix.rust}}
-      run: cargo test --all
+      run:
+        apt-get install -y libfreetype-dev
+        cargo test --all
 
   macos:
     runs-on: macOS-latest
