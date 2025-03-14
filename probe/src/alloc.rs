@@ -2,7 +2,7 @@ use std::sync::atomic::AtomicUsize;
 
 pub static ALLOCATED: AtomicUsize = AtomicUsize::new(0);
 pub static FREEED: AtomicUsize = AtomicUsize::new(0);
-
+pub static big_tensor_cnt: AtomicUsize = AtomicUsize::new(0);
 /// Setup global allocator instrumentation, to track rust-managed memory.
 ///
 /// It is not mandatory to do so, as we also register the RSZ and VSZ as
@@ -34,6 +34,17 @@ macro_rules! wrap_global_allocator {
                     $crate::alloc::FREEED.fetch_add(layout.size(), Relaxed);
                 }
                 $alloc.dealloc(ptr, layout);
+            }
+            unsafe fn realloc(&self, ptr: *mut u8, layout: std::alloc::Layout, new_size: usize) -> *mut u8 {
+                use std::sync::atomic::Ordering::*;
+                if !ptr.is_null() {
+                    $crate::alloc::FREEED.fetch_add(layout.size(), Relaxed);
+                }
+                let ptr = $alloc.realloc(ptr, layout, new_size);
+                if !ptr.is_null() {
+                    $crate::alloc::ALLOCATED.fetch_add(layout.size(), Relaxed);
+                }
+                ptr
             }
         }
     };
