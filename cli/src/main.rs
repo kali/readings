@@ -204,7 +204,9 @@ fn plot(data: &str, matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error
     chart.draw_secondary_series(
         AreaSeries::new(
             data.iter()
-                .map(|l| (val(l, 0), val::<i64>(l, 9) - val::<i64>(l, 10))),
+                .map(|l| {
+                    (val(l, 0), val::<i64>(l, 9) - val::<i64>(l, 10))
+                }),
             0,
             &BLUE.mix(0.3),
         )
@@ -212,7 +214,7 @@ fn plot(data: &str, matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error
     )?;
 
     chart.draw_secondary_series(
-        AreaSeries::new(line(&data, 3), 0, &BLUE.mix(0.3)).border_style(&BLUE),
+        AreaSeries::new(line(&data, 3), 0, &BLACK.mix(0.3)).border_style(&BLACK),
     )?;
 
     for (ix, ud) in user_defined.iter().enumerate() {

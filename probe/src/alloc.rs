@@ -35,6 +35,17 @@ macro_rules! wrap_global_allocator {
                 }
                 $alloc.dealloc(ptr, layout);
             }
+            unsafe fn realloc(&self, ptr: *mut u8, layout: std::alloc::Layout, new_size: usize) -> *mut u8 {
+                use std::sync::atomic::Ordering::*;
+                if !ptr.is_null() {
+                    $crate::alloc::FREEED.fetch_add(layout.size(), Relaxed);
+                }
+                let ptr = $alloc.realloc(ptr, layout, new_size);
+                if !ptr.is_null() {
+                    $crate::alloc::ALLOCATED.fetch_add(layout.size(), Relaxed);
+                }
+                ptr
+            }
         }
     };
 }
