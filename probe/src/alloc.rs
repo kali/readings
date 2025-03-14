@@ -2,7 +2,6 @@ use std::sync::atomic::AtomicUsize;
 
 pub static ALLOCATED: AtomicUsize = AtomicUsize::new(0);
 pub static FREEED: AtomicUsize = AtomicUsize::new(0);
-pub static big_tensor_cnt: AtomicUsize = AtomicUsize::new(0);
 /// Setup global allocator instrumentation, to track rust-managed memory.
 ///
 /// It is not mandatory to do so, as we also register the RSZ and VSZ as
