@@ -42,7 +42,7 @@ macro_rules! wrap_global_allocator {
                 }
                 let ptr = $alloc.realloc(ptr, layout, new_size);
                 if !ptr.is_null() {
-                    $crate::alloc::ALLOCATED.fetch_add(layout.size(), Relaxed);
+                    $crate::alloc::ALLOCATED.fetch_add(new_size, Relaxed);
                 }
                 ptr
             }
